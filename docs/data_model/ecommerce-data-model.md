@@ -1,130 +1,63 @@
-# Ecommerce Data Model
+# E-Commerce Data Model
 
-## Overview
+## 1. Purpose
 
-This document describes the data model used by the e-commerce data platform.
+This document defines the source data model for the E-Commerce Data Platform.
 
-The model is designed to support:
+The initial historical dataset is based on the Brazilian Olist e-commerce dataset.
 
-- Customer analysis
-- Product and catalog analysis
-- Order and sales analysis
-- Payment analysis
-- Delivery and logistics analysis
-- Business and operational reporting
+The platform will use the original Olist datasets as source data and will progressively extend the historical dataset with synthetic incremental batches to demonstrate scalable Data Engineering patterns.
 
-The data model follows a dimensional approach, separating measurable business events from descriptive entities.
+The platform is designed to demonstrate:
 
-## Data Domains
+- Batch ingestion
+- Incremental processing
+- PySpark transformations
+- Delta Lake
+- Data quality
+- Deduplication
+- Change Data Capture (CDC)
+- Slowly Changing Dimensions Type 2 (SCD2)
+- Data lineage
+- SQL analytics
+- CI/CD
+- Databricks Jobs
 
-The platform is organized around the following main domains:
+---
 
-- Customers
-- Products
-- Orders
-- Order Items
-- Payments
-- Shipping
-- Reviews
+## 2. Source Dataset
 
-## Core Entities
+The initial source consists of nine CSV datasets.
 
-### Customer
+| Source | Rows | Columns |
+|---|---:|---:|
+| customers | 99,441 | 5 |
+| geolocation | 1,000,163 | 5 |
+| orders | 99,441 | 8 |
+| order_items | 112,650 | 7 |
+| order_payments | 103,886 | 5 |
+| order_reviews | 99,224 | 7 |
+| products | 32,951 | 9 |
+| sellers | 3,095 | 4 |
+| category_translation | 71 | 2 |
 
-Represents a customer registered on the e-commerce platform.
+The source files will remain outside the Git repository and will not be committed to GitHub.
 
-Typical attributes:
+---
 
-- `customer_id`
-- `customer_unique_id`
-- `customer_zip_code_prefix`
-- `customer_city`
-- `customer_state`
+## 3. Bronze Layer
 
-### Product
+The Bronze layer will preserve the source datasets with minimal transformation.
 
-Represents a product available through the platform.
-
-Typical attributes:
-
-- `product_id`
-- `product_category`
-- `product_name_length`
-- `product_description_length`
-- `product_photos_qty`
-- `product_weight_g`
-- `product_length_cm`
-- `product_height_cm`
-- `product_width_cm`
-
-### Order
-
-Represents a customer order.
-
-Typical attributes:
-
-- `order_id`
-- `customer_id`
-- `order_status`
-- `order_purchase_timestamp`
-- `order_approved_at`
-- `order_delivered_carrier_date`
-- `order_delivered_customer_date`
-- `order_estimated_delivery_date`
-
-### Order Item
-
-Represents a product included in an order.
-
-Typical attributes:
-
-- `order_id`
-- `order_item_id`
-- `product_id`
-- `seller_id`
-- `shipping_limit_date`
-- `price`
-- `freight_value`
-
-### Payment
-
-Represents a payment associated with an order.
-
-Typical attributes:
-
-- `order_id`
-- `payment_sequential`
-- `payment_type`
-- `payment_installments`
-- `payment_value`
-
-### Review
-
-Represents a customer review associated with an order.
-
-Typical attributes:
-
-- `review_id`
-- `order_id`
-- `review_score`
-- `review_comment_title`
-- `review_comment_message`
-- `review_creation_date`
-- `review_answer_timestamp`
-
-## Relationships
-
-The main relationships are:
+The following Delta tables will be created:
 
 ```text
-Customer
-   │
-   └──< Order
-          │
-          ├──< Order Item >── Product
-          │        │
-          │        └── Seller
-          │
-          ├──< Payment
-          │
-          └──< Review
+main.ecommerce_bronze.customers
+main.ecommerce_bronze.geolocation
+main.ecommerce_bronze.orders
+main.ecommerce_bronze.order_items
+main.ecommerce_bronze.order_payments
+main.ecommerce_bronze.order_reviews
+main.ecommerce_bronze.products
+main.ecommerce_bronze.sellers
+main.ecommerce_bronze.product_category_translation
