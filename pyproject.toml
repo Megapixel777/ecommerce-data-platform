@@ -9,6 +9,10 @@ description = "End-to-end e-commerce data engineering platform built with PySpar
 requires-python = ">=3.12,<3.13"
 readme = "README.md"
 
+dependencies = [
+    "pyspark>=4.0,<5.0",
+]
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8,<9",
