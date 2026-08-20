@@ -22,6 +22,9 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+markers = [
+    "integration: tests that require external/local datasets",
+]
 
 [tool.ruff]
 line-length = 100
