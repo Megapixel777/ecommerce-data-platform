@@ -1,10 +1,9 @@
 from pyspark.sql.types import (
+    StringType,
     StructField,
     StructType,
-    StringType,
     TimestampType,
 )
-
 
 ORDERS_SCHEMA = StructType(
     [
