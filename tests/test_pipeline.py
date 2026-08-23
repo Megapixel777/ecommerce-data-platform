@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+import pytest
 from dotenv import load_dotenv
 from pyspark.sql import SparkSession
 
@@ -8,7 +9,7 @@ from src.pipeline import run_pipeline
 
 load_dotenv()
 
-
+@pytest.mark.integration
 def test_run_pipeline():
     spark = (
         SparkSession.builder
