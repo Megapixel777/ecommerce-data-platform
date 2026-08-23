@@ -22,7 +22,11 @@ def run_pipeline(
     write_parquet(bronze, output_dir / "bronze" / "order_items")
 
     silver = transform_order_items(bronze)
-    write_parquet(silver, output_dir / "silver" / "order_items")
+    write_parquet(
+        silver,
+        output_dir / "silver" / "order_items",
+        partition_by=["shipping_year", "shipping_month"],
+    )
 
     order_sales = build_order_sales(silver)
     write_parquet(order_sales, output_dir / "gold" / "order_sales")

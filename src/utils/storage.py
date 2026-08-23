@@ -10,4 +10,9 @@ def write_parquet(
 ) -> None:
     """Write a DataFrame to Parquet using overwrite mode."""
 
-    df.write.mode("overwrite").parquet(str(output_path))
+    writer = df.write.mode("overwrite")
+
+    if partition_by:
+        writer = writer.partitionBy(*partition_by)
+
+    writer.parquet(str(output_path))
