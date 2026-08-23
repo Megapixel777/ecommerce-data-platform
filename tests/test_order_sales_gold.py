@@ -1,9 +1,11 @@
+import pytest
 from pyspark.sql import SparkSession
 
 from src.gold.order_sales import build_order_sales
 
 
-def test_build_order_sales():
+@pytest.fixture(scope="module")
+def spark():
     spark = (
         SparkSession.builder
         .master("local[2]")
@@ -11,6 +13,12 @@ def test_build_order_sales():
         .getOrCreate()
     )
 
+    yield spark
+
+    spark.stop()
+
+
+def test_build_order_sales(spark):
     data = [
         ("A", 10.0),
         ("A", 20.0),
@@ -36,5 +44,3 @@ def test_build_order_sales():
 
     assert rows["A"] == (30.0, 2)
     assert rows["B"] == (50.0, 3)
-
-    spark.stop()
