@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 
 from pyspark.sql import DataFrame, SparkSession
@@ -35,3 +36,42 @@ def run_pipeline(
     write_parquet(kpis, output_dir / "gold" / "kpis")
 
     return kpis
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Run the Olist order items pipeline."
+    )
+
+    parser.add_argument(
+        "--input-path",
+        required=True,
+        help="Path to the Olist order items CSV.",
+    )
+
+    parser.add_argument(
+        "--output-dir",
+        required=True,
+        help="Directory where pipeline outputs will be written.",
+    )
+
+    args = parser.parse_args()
+
+    spark = (
+        SparkSession.builder
+        .appName("olist-pipeline")
+        .getOrCreate()
+    )
+
+    try:
+        run_pipeline(
+            spark,
+            args.input_path,
+            args.output_dir,
+        )
+    finally:
+        spark.stop()
+
+
+if __name__ == "__main__":
+    main()
