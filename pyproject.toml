@@ -11,6 +11,7 @@ readme = "README.md"
 
 dependencies = [
     "pyspark>=4.0,<5.0",
+    "python-dotenv>=1.0,<2.0",
 ]
 
 [project.optional-dependencies]

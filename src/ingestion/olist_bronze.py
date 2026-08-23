@@ -3,7 +3,7 @@ from pathlib import Path
 from pyspark.sql import DataFrame, SparkSession
 
 from src.ingestion.loader import load_csv
-from src.ingestion.schemas import CUSTOMERS_SCHEMA, ORDERS_SCHEMA
+from src.ingestion.schemas import CUSTOMERS_SCHEMA, ORDER_ITEMS_SCHEMA, ORDERS_SCHEMA
 
 
 def load_orders(
@@ -28,4 +28,16 @@ def load_customers(
         spark,
         input_path,
         CUSTOMERS_SCHEMA,
+    )
+
+def load_order_items(
+    spark: SparkSession,
+    input_path: str | Path,
+) -> DataFrame:
+    """Load Olist order items CSV using the explicit order items schema."""
+
+    return load_csv(
+        spark,
+        input_path,
+        ORDER_ITEMS_SCHEMA,
     )
