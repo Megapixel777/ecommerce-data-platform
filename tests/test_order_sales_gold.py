@@ -1,7 +1,7 @@
 import pytest
 from pyspark.sql import SparkSession
 
-from src.gold.order_sales import build_order_sales
+from src.gold.kpis import build_kpis
 
 
 @pytest.fixture(scope="module")
@@ -9,7 +9,7 @@ def spark():
     spark = (
         SparkSession.builder
         .master("local[2]")
-        .appName("test-order-sales-gold")
+        .appName("test-kpis-gold")
         .getOrCreate()
     )
 
@@ -18,29 +18,20 @@ def spark():
     spark.stop()
 
 
-def test_build_order_sales(spark):
+def test_build_kpis(spark):
     data = [
-        ("A", 10.0),
-        ("A", 20.0),
-        ("B", 15.0),
-        ("B", 25.0),
-        ("B", 10.0),
+        ("A", 30.0, 2),
+        ("B", 50.0, 3),
     ]
 
-    df = spark.createDataFrame(
+    order_sales = spark.createDataFrame(
         data,
-        ["order_id", "total_item_value"],
+        ["order_id", "total_order_value", "item_count"],
     )
 
-    result = build_order_sales(df)
+    result = build_kpis(order_sales).first()
 
-    rows = {
-        row["order_id"]: (
-            row["total_order_value"],
-            row["item_count"],
-        )
-        for row in result.collect()
-    }
-
-    assert rows["A"] == (30.0, 2)
-    assert rows["B"] == (50.0, 3)
+    assert result["total_orders"] == 2
+    assert result["total_revenue"] == 80.0
+    assert result["average_order_value"] == 40.0
+    assert result["total_items"] == 5
