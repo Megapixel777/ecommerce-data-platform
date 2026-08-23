@@ -2,7 +2,8 @@ from pathlib import Path
 
 from pyspark.sql import DataFrame, SparkSession
 
-from src.ingestion.schemas import ORDERS_SCHEMA
+from src.ingestion.loader import load_csv
+from src.ingestion.schemas import CUSTOMERS_SCHEMA, ORDERS_SCHEMA
 
 
 def load_orders(
@@ -11,17 +12,20 @@ def load_orders(
 ) -> DataFrame:
     """Load Olist orders CSV using the explicit orders schema."""
 
-    path = Path(input_path)
+    return load_csv(
+        spark,
+        input_path,
+        ORDERS_SCHEMA,
+    )
 
-    if not path.exists():
-        raise FileNotFoundError(f"Input file not found: {path}")
+def load_customers(
+    spark: SparkSession,
+    input_path: str | Path,
+) -> DataFrame:
+    """Load Olist customers CSV using the explicit customers schema."""
 
-    if not path.is_file():
-        raise ValueError(f"Input path is not a file: {path}")
-
-    return (
-        spark.read
-        .option("header", True)
-        .schema(ORDERS_SCHEMA)
-        .csv(str(path))
+    return load_csv(
+        spark,
+        input_path,
+        CUSTOMERS_SCHEMA,
     )

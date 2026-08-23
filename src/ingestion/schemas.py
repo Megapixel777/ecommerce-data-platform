@@ -17,3 +17,13 @@ ORDERS_SCHEMA = StructType(
         StructField("order_estimated_delivery_date", TimestampType(), True),
     ]
 )
+
+CUSTOMERS_SCHEMA = StructType(
+    [
+        StructField("customer_id", StringType(), False),
+        StructField("customer_unique_id", StringType(), False),
+        StructField("customer_zip_code_prefix", StringType(), True),
+        StructField("customer_city", StringType(), True),
+        StructField("customer_state", StringType(), True),
+    ]
+)
