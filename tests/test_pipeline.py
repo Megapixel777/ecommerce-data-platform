@@ -6,7 +6,8 @@ from pyspark.sql import SparkSession
 
 from src.pipeline import run_pipeline
 
-load_dotenv() #To load the environment variables from the .env file
+load_dotenv()
+
 
 def test_run_pipeline():
     spark = (
@@ -16,11 +17,18 @@ def test_run_pipeline():
         .getOrCreate()
     )
 
-    input_path = Path(
-    os.environ["OLIST_DATA_PATH"]
-) / "olist_order_items_dataset.csv"
+    input_path = (
+        Path(os.environ["OLIST_DATA_PATH"])
+        / "olist_order_items_dataset.csv"
+    )
 
-    result = run_pipeline(spark, input_path)
+    output_dir = Path("tests/test_output")
+
+    result = run_pipeline(
+        spark,
+        input_path,
+        output_dir,
+    )
 
     row = result.first()
 

@@ -6,20 +6,28 @@ from src.gold.kpis import build_kpis
 from src.gold.order_sales import build_order_sales
 from src.ingestion.olist_bronze import load_order_items
 from src.silver.order_items import transform_order_items
+from src.utils.storage import write_parquet
 
 
 def run_pipeline(
     spark: SparkSession,
     input_path: str | Path,
+    output_dir: str | Path,
 ) -> DataFrame:
     """Run the Olist order items pipeline from Bronze to Gold."""
 
+    output_dir = Path(output_dir)
+
     bronze = load_order_items(spark, input_path)
+    write_parquet(bronze, output_dir / "bronze" / "order_items")
 
     silver = transform_order_items(bronze)
+    write_parquet(silver, output_dir / "silver" / "order_items")
 
     order_sales = build_order_sales(silver)
+    write_parquet(order_sales, output_dir / "gold" / "order_sales")
 
     kpis = build_kpis(order_sales)
+    write_parquet(kpis, output_dir / "gold" / "kpis")
 
     return kpis
