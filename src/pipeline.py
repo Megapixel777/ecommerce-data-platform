@@ -14,6 +14,7 @@ from src.ingestion.olist_bronze import (
 )
 from src.quality.orders import check_orders_quality, validate_quality_results
 from src.silver.order_items import transform_order_items
+from src.spark import create_spark_session
 from src.utils.storage import write_parquet
 
 logging.basicConfig(
@@ -117,11 +118,7 @@ def main() -> None:
 
     logger.info("Environment: %s", config.environment)
 
-    spark = (
-        SparkSession.builder
-        .appName("olist-pipeline")
-        .getOrCreate()
-    )
+    spark = create_spark_session()
 
     try:
         run_pipeline(

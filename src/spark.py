@@ -1,5 +1,4 @@
 import os
-import sys
 
 from delta import configure_spark_with_delta_pip
 from pyspark.sql import SparkSession
@@ -15,7 +14,7 @@ def create_spark_session() -> SparkSession:
 
     python_executable = os.environ.get(
         "PYSPARK_PYTHON",
-        sys.executable,
+        "C:/Users/thoma/anaconda3/envs/ecommerce-data-platform-py311/python.exe",
     )
 
     os.environ["PYSPARK_PYTHON"] = python_executable
@@ -25,14 +24,6 @@ def create_spark_session() -> SparkSession:
         SparkSession.builder
         .master("local[2]")
         .appName("ecommerce-data-platform")
-        .config(
-            "spark.pyspark.python",
-            python_executable,
-        )
-        .config(
-            "spark.pyspark.driver.python",
-            python_executable,
-        )
         .config(
             "spark.sql.extensions",
             "io.delta.sql.DeltaSparkSessionExtension",

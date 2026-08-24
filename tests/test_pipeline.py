@@ -19,10 +19,7 @@ def test_run_pipeline(tmp_path):
         .getOrCreate()
     )
 
-    input_path = (
-        Path(os.environ["OLIST_DATA_PATH"])
-        / "olist_order_items_dataset.csv"
-    )
+    input_path = Path(os.environ["OLIST_DATA_PATH"])
 
     output_dir = tmp_path / "pipeline_output"
 
