@@ -128,7 +128,10 @@ def main() -> None:
             spark,
             input_path,
             output_dir,
-        )
+    )
+    except Exception:
+        logger.exception("Pipeline execution failed")
+        raise
     finally:
         spark.stop()
 
