@@ -4,6 +4,7 @@ from pathlib import Path
 
 from pyspark.sql import DataFrame, SparkSession
 
+from src.config import load_config
 from src.gold.kpis import build_kpis
 from src.gold.order_sales import build_order_sales
 from src.ingestion.olist_bronze import load_order_items
@@ -57,23 +58,39 @@ def run_pipeline(
 
 
 def main() -> None:
+    config = load_config()
+
     parser = argparse.ArgumentParser(
         description="Run the Olist order items pipeline."
     )
 
     parser.add_argument(
         "--input-path",
-        required=True,
+        default=None,
         help="Path to the Olist order items CSV.",
     )
 
     parser.add_argument(
         "--output-dir",
-        required=True,
+        default=None,
         help="Directory where pipeline outputs will be written.",
     )
 
     args = parser.parse_args()
+
+    input_path = (
+        Path(args.input_path)
+        if args.input_path
+        else config.input_path / "olist_order_items_dataset.csv"
+    )
+
+    output_dir = (
+        Path(args.output_dir)
+        if args.output_dir
+        else config.output_dir
+    )
+
+    logger.info("Environment: %s", config.environment)
 
     spark = (
         SparkSession.builder
@@ -84,8 +101,8 @@ def main() -> None:
     try:
         run_pipeline(
             spark,
-            args.input_path,
-            args.output_dir,
+            input_path,
+            output_dir,
         )
     finally:
         spark.stop()
