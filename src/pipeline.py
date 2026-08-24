@@ -7,7 +7,12 @@ from pyspark.sql import DataFrame, SparkSession
 from src.config import load_config
 from src.gold.kpis import build_kpis
 from src.gold.order_sales import build_order_sales
-from src.ingestion.olist_bronze import load_order_items
+from src.ingestion.olist_bronze import (
+    load_customers,
+    load_order_items,
+    load_orders,
+)
+from src.quality.orders import check_orders_quality, validate_quality_results
 from src.silver.order_items import transform_order_items
 from src.utils.storage import write_parquet
 
@@ -26,14 +31,34 @@ def run_pipeline(
 ) -> DataFrame:
     """Run the Olist order items pipeline from Bronze to Gold."""
 
+    input_path = Path(input_path)
     output_dir = Path(output_dir)
 
     logger.info("Starting Olist pipeline")
     logger.info("Input path: %s", input_path)
     logger.info("Output directory: %s", output_dir)
 
-    logger.info("Loading Bronze data")
-    bronze = load_order_items(spark, input_path)
+    orders_path = input_path / "olist_orders_dataset.csv"
+    customers_path = input_path / "olist_customers_dataset.csv"
+    order_items_path = input_path / "olist_order_items_dataset.csv"
+
+    logger.info("Loading Orders data")
+    orders = load_orders(spark, orders_path)
+
+    logger.info("Loading Customers data")
+    customers = load_customers(spark, customers_path)
+
+    logger.info("Running Orders data quality checks")
+    quality_results = check_orders_quality(orders, customers)
+
+    for check, result in quality_results.items():
+        logger.info("Data quality - %s: %s", check, result)
+
+    validate_quality_results(quality_results)
+    logger.info("Data quality checks passed")
+
+    logger.info("Loading Bronze order items")
+    bronze = load_order_items(spark, order_items_path)
     write_parquet(bronze, output_dir / "bronze" / "order_items")
 
     logger.info("Transforming Silver data")
@@ -67,7 +92,7 @@ def main() -> None:
     parser.add_argument(
         "--input-path",
         default=None,
-        help="Path to the Olist order items CSV.",
+        help="Path to the Olist dataset directory.",
     )
 
     parser.add_argument(
@@ -81,7 +106,7 @@ def main() -> None:
     input_path = (
         Path(args.input_path)
         if args.input_path
-        else config.input_path / "olist_order_items_dataset.csv"
+        else config.input_path
     )
 
     output_dir = (

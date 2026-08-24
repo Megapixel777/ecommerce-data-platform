@@ -30,3 +30,25 @@ def check_orders_quality(orders: DataFrame, customers: DataFrame) -> dict[str, i
         "duplicate_order_id": duplicate_orders,
         "orphan_customer_id": orphan_orders,
     }
+
+
+def validate_quality_results(results: dict[str, int]) -> None:
+    """Raise an error when critical data quality checks fail."""
+
+    critical_checks = {
+        "null_order_id",
+        "null_customer_id",
+        "duplicate_order_id",
+        "orphan_customer_id",
+    }
+
+    failures = {
+        check: value
+        for check, value in results.items()
+        if check in critical_checks and value > 0
+    }
+
+    if failures:
+        raise ValueError(
+            f"Data quality checks failed: {failures}"
+        )
