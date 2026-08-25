@@ -1,9 +1,8 @@
-from pathlib import Path
-
 import pytest
 from pyspark.sql import SparkSession
 from pyspark.sql.types import IntegerType
 
+from src.config import load_config
 from src.ingestion.olist_bronze import load_order_items
 
 
@@ -16,8 +15,9 @@ def test_load_order_items():
         .getOrCreate()
     )
 
-    input_path = Path(
-        r"C:\Users\thoma\OneDrive\Desktop\olist\olist_order_items_dataset.csv"
+    input_path = (
+        load_config().input_path
+        / "olist_order_items_dataset.csv"
     )
 
     df = load_order_items(spark, input_path)

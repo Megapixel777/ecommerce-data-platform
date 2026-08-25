@@ -1,0 +1,13 @@
+services:
+  ecommerce-data-platform:
+    build: .
+    container_name: ecommerce-data-platform
+    environment:
+      OLIST_DATA_PATH: /app/data/raw
+      OUTPUT_DIR: /app/data/processed
+      ENVIRONMENT: docker
+      PYSPARK_PYTHON: /usr/local/bin/python
+      PYSPARK_DRIVER_PYTHON: /usr/local/bin/python
+    volumes:
+      - "C:/Users/thoma/OneDrive/Desktop/olist:/app/data/raw"
+      - "./data:/app/data/processed"

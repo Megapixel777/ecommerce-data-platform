@@ -1,13 +1,9 @@
-import os
-from pathlib import Path
 
 import pytest
-from dotenv import load_dotenv
 from pyspark.sql import SparkSession
 
+from src.config import load_config
 from src.pipeline import run_pipeline
-
-load_dotenv()
 
 
 @pytest.mark.integration
@@ -19,7 +15,7 @@ def test_run_pipeline(tmp_path):
         .getOrCreate()
     )
 
-    input_path = Path(os.environ["OLIST_DATA_PATH"])
+    input_path = load_config().input_path
 
     output_dir = tmp_path / "pipeline_output"
 
