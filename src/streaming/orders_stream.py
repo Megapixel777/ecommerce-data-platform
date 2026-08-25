@@ -1,3 +1,7 @@
+import argparse
+import logging
+from pathlib import Path
+
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import (
     avg,
@@ -5,6 +9,16 @@ from pyspark.sql.functions import (
     sum,
     window,
 )
+
+from src.config import load_config
+from src.spark import create_spark_session
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
+logger = logging.getLogger(__name__)
 
 
 def read_order_stream(
@@ -29,6 +43,7 @@ def read_order_stream(
         .load(input_path)
     )
 
+
 def write_order_stream(
     stream_df: DataFrame,
     output_path: str,
@@ -44,6 +59,7 @@ def write_order_stream(
         .trigger(availableNow=True)
         .start(output_path)
     )
+
 
 def aggregate_order_stream(
     stream_df: DataFrame,
@@ -63,6 +79,7 @@ def aggregate_order_stream(
         )
     )
 
+
 def write_aggregated_order_stream(
     aggregated_df: DataFrame,
     output_path: str,
@@ -78,6 +95,7 @@ def write_aggregated_order_stream(
         .trigger(availableNow=True)
         .start(output_path)
     )
+
 
 def run_order_stream(
     spark: SparkSession,
@@ -101,3 +119,79 @@ def run_order_stream(
         output_path,
         checkpoint_path,
     )
+
+
+def main() -> None:
+    config = load_config()
+
+    parser = argparse.ArgumentParser(
+        description="Run the Olist order streaming pipeline."
+    )
+
+    parser.add_argument(
+        "--input-path",
+        default=None,
+        help="Path to the streaming events directory.",
+    )
+
+    parser.add_argument(
+        "--output-dir",
+        default=None,
+        help="Directory where streaming outputs will be written.",
+    )
+
+    parser.add_argument(
+        "--checkpoint-dir",
+        default=None,
+        help="Directory where the streaming checkpoint will be stored.",
+    )
+
+    args = parser.parse_args()
+
+    input_path = (
+        Path(args.input_path)
+        if args.input_path
+        else config.input_path
+    )
+
+    output_dir = (
+        Path(args.output_dir)
+        if args.output_dir
+        else config.output_dir
+    )
+
+    checkpoint_dir = (
+        Path(args.checkpoint_dir)
+        if args.checkpoint_dir
+        else output_dir / "checkpoints" / "orders"
+    )
+
+    logger.info("Environment: %s", config.environment)
+    logger.info("Streaming input path: %s", input_path)
+    logger.info("Streaming output path: %s", output_dir)
+    logger.info("Streaming checkpoint path: %s", checkpoint_dir)
+
+    spark = create_spark_session()
+
+    try:
+        query = run_order_stream(
+            spark,
+            str(input_path),
+            str(output_dir / "gold" / "streaming_order_metrics"),
+            str(checkpoint_dir),
+        )
+
+        query.awaitTermination()
+
+        logger.info("Streaming pipeline completed successfully")
+
+    except Exception:
+        logger.exception("Streaming pipeline execution failed")
+        raise
+
+    finally:
+        spark.stop()
+
+
+if __name__ == "__main__":
+    main()
