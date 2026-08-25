@@ -31,3 +31,6 @@ jobs:
 
       - name: Run tests
         run: pytest -m "not integration"
+
+      - name: Build Docker image
+        run: docker compose build
