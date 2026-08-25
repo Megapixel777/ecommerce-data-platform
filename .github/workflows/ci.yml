@@ -34,3 +34,4 @@ jobs:
 
       - name: Build Docker image
         run: docker compose build
+        
