@@ -1,7 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import avg, count, sum
 
-
 BUCKET = "gs://ecommerce-data-platform-gen-lang-client-0097541881"
 
 spark = SparkSession.builder.appName("DataprocOrdersTest").getOrCreate()
