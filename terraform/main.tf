@@ -21,3 +21,36 @@ resource "google_bigquery_dataset" "ecommerce" {
   dataset_id = "ecommerce"
   location   = "EUROPE-WEST4"
 }
+
+resource "google_bigquery_table" "orders" {
+  dataset_id = google_bigquery_dataset.ecommerce.dataset_id
+  table_id   = "orders"
+
+  schema = jsonencode([
+    {
+      name = "order_id"
+      type = "STRING"
+      mode = "NULLABLE"
+    },
+    {
+      name = "customer_id"
+      type = "STRING"
+      mode = "NULLABLE"
+    },
+    {
+      name = "event_time"
+      type = "TIMESTAMP"
+      mode = "NULLABLE"
+    },
+    {
+      name = "status"
+      type = "STRING"
+      mode = "NULLABLE"
+    },
+    {
+      name = "value"
+      type = "FLOAT64"
+      mode = "NULLABLE"
+    }
+  ])
+}
