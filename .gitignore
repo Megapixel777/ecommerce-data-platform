@@ -86,3 +86,11 @@ data/streaming_test/
 # =========================
 
 .databricks/
+
+# =========================
+# Terraform
+# =========================
+
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
