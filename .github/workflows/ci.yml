@@ -29,6 +29,9 @@ jobs:
       - name: Run Ruff
         run: ruff check .
 
+      - name: Check Java
+        run: java -version
+
       - name: Run tests
         run: pytest -m "not integration"
 
