@@ -44,23 +44,6 @@ def read_order_stream(
     )
 
 
-def write_order_stream(
-    stream_df: DataFrame,
-    output_path: str,
-    checkpoint_path: str,
-):
-    """Write order events to Delta using Structured Streaming."""
-
-    return (
-        stream_df.writeStream
-        .format("delta")
-        .outputMode("append")
-        .option("checkpointLocation", checkpoint_path)
-        .trigger(availableNow=True)
-        .start(output_path)
-    )
-
-
 def aggregate_order_stream(
     stream_df: DataFrame,
 ) -> DataFrame:

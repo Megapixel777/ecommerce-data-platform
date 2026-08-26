@@ -79,6 +79,7 @@ Thumbs.db
 data/raw/
 data/processed/
 data/output/
+data/streaming_test/
 
 # =========================
 # Databricks
