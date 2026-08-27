@@ -30,4 +30,23 @@ result = (
 
 result.show(truncate=False)
 
+print("=== WRITING TO BIGQUERY ===")
+
+(
+    result.write
+    .format("bigquery")
+    .option(
+        "table",
+        "gen-lang-client-0097541881.ecommerce.orders_summary",
+    )
+    .option(
+        "temporaryGcsBucket",
+        BUCKET.replace("gs://", ""),
+    )
+    .mode("overwrite")
+    .save()
+)
+
+print("=== BIGQUERY WRITE COMPLETE ===")
+
 spark.stop()

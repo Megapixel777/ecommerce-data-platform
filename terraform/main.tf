@@ -54,3 +54,31 @@ resource "google_bigquery_table" "orders" {
     }
   ])
 }
+
+resource "google_bigquery_table" "orders_summary" {
+  dataset_id = google_bigquery_dataset.ecommerce.dataset_id
+  table_id   = "orders_summary"
+
+  schema = jsonencode([
+    {
+      name = "status"
+      type = "STRING"
+      mode = "NULLABLE"
+    },
+    {
+      name = "orders_count"
+      type = "INT64"
+      mode = "REQUIRED"
+    },
+    {
+      name = "total_revenue"
+      type = "FLOAT64"
+      mode = "NULLABLE"
+    },
+    {
+      name = "average_order_value"
+      type = "FLOAT64"
+      mode = "NULLABLE"
+    }
+  ])
+}
